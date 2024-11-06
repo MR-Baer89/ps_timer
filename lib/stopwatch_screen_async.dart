@@ -1,39 +1,31 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
-class StopwatchScreen extends StatefulWidget {
-  const StopwatchScreen({super.key});
+class StopwatchScreenAsync extends StatefulWidget {
+  const StopwatchScreenAsync({super.key});
 
   @override
-  State<StopwatchScreen> createState() => _StopwatchScreenState();
+  State<StopwatchScreenAsync> createState() => _StopwatchScreenAsyncState();
 }
 
-class _StopwatchScreenState extends State<StopwatchScreen> {
+class _StopwatchScreenAsyncState extends State<StopwatchScreenAsync> {
   int _elapsedSeconds = 0;
-  bool _isTimerRunning = false;
+  Timer? _timer;
 
   void _startTimer() {
-    setState(() {
-      _isTimerRunning = true;
-    });
-
-    Future.delayed(const Duration(seconds: 1), () {
-      if (_isTimerRunning) {
-        setState(() {
-          _elapsedSeconds++;
-        });
-        _startTimer();
-      }
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedSeconds++;
+      });
     });
   }
 
   void _stopTimer() {
-    setState(() {
-      _isTimerRunning = false;
-    });
+    _timer?.cancel();
   }
 
   void _resetTimer() {
-    _stopTimer();
+    _timer?.cancel();
     setState(() {
       _elapsedSeconds = 0;
     });
@@ -58,11 +50,11 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 ElevatedButton(
-                  onPressed: _isTimerRunning ? null : _startTimer,
+                  onPressed: _startTimer,
                   child: const Text('Start'),
                 ),
                 ElevatedButton(
-                  onPressed: _isTimerRunning ? _stopTimer : null,
+                  onPressed: _stopTimer,
                   child: const Text('Stop'),
                 ),
                 ElevatedButton(
