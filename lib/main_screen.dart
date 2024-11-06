@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ps_timer/stopwatch_screen.dart';
 import 'package:ps_timer/timer_screen.dart';
+import 'package:ps_timer/timer_screen_async.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -14,6 +15,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const TimerScreen(),
+    const TimerScreenAsync(),
     const StopwatchScreen(),
   ];
 
@@ -36,6 +38,10 @@ class _MainScreenState extends State<MainScreen> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.timer),
+            label: 'Timer',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.av_timer),
             label: 'Timer',
           ),
           BottomNavigationBarItem(

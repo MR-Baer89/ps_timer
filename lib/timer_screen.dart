@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 class TimerScreen extends StatefulWidget {
@@ -9,30 +8,34 @@ class TimerScreen extends StatefulWidget {
 }
 
 class TimerScreenState extends State<TimerScreen> {
-  int remainingSeconds = 0;
-  Timer? timer;
-  final TextEditingController durationController = TextEditingController();
+  int _remainingSeconds = 0;
+  bool _isTimerRunning = false;
+  final TextEditingController _durationController = TextEditingController();
 
-  void startTimer() {
-    final durationInSeconds = int.tryParse(durationController.text) ?? 0;
-    remainingSeconds = durationInSeconds;
-
-    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (remainingSeconds > 0) {
-          remainingSeconds--;
-        } else {
-          timer.cancel();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Timer abgelaufen!')),
-          );
-        }
-      });
+  Future<void> _startTimer() async {
+    setState(() {
+      _isTimerRunning = true;
     });
+
+    final durationInSeconds = int.tryParse(_durationController.text) ?? 0;
+    for (int i = durationInSeconds; i >= 0; i--) {
+      await Future.delayed(const Duration(seconds: 1));
+      setState(() {
+        _remainingSeconds = i;
+      });
+      if (i == 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Timer abgelaufen!')),
+        );
+        _isTimerRunning = false;
+      }
+    }
   }
 
-  void stopTimer() {
-    timer?.cancel();
+  void _stopTimer() {
+    setState(() {
+      _isTimerRunning = false;
+    });
   }
 
   @override
@@ -44,15 +47,15 @@ class TimerScreenState extends State<TimerScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
-              controller: durationController,
+              controller: _durationController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                   labelText: 'Dauer in Sekunden', border: OutlineInputBorder()),
             ),
             const SizedBox(height: 20),
             Text(
-              'Verbleibende Zeit: ${(remainingSeconds / 60).floor()}:'
-              '${remainingSeconds % 60}',
+              'Verbleibende Zeit: ${(_remainingSeconds / 60).floor()}:'
+              '${_remainingSeconds % 60}',
               style: const TextStyle(fontSize: 24),
             ),
             const SizedBox(height: 20),
@@ -60,11 +63,11 @@ class TimerScreenState extends State<TimerScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 ElevatedButton(
-                  onPressed: startTimer,
+                  onPressed: _isTimerRunning ? null : _startTimer,
                   child: const Text('Start'),
                 ),
                 ElevatedButton(
-                  onPressed: stopTimer,
+                  onPressed: _isTimerRunning ? _stopTimer : null,
                   child: const Text('Stop'),
                 ),
               ],
