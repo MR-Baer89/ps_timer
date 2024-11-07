@@ -12,18 +12,33 @@ class TimerScreenState extends State<TimerScreen> {
   bool _isTimerRunning = false;
   final TextEditingController _durationController = TextEditingController();
 
-  Future<void> _startTimer() async {
+  void _startTimer() {
+    final durationInSeconds = int.tryParse(_durationController.text);
+    if (durationInSeconds == null || durationInSeconds <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bitte eine gültige Dauer eingeben')),
+      );
+      return;
+    }
+
     setState(() {
+      _remainingSeconds = durationInSeconds;
       _isTimerRunning = true;
     });
 
-    final durationInSeconds = int.tryParse(_durationController.text) ?? 0;
-    for (int i = durationInSeconds; i >= 0; i--) {
+    _runTimer();
+  }
+
+  Future<void> _runTimer() async {
+    while (_isTimerRunning && _remainingSeconds > 0) {
       await Future.delayed(const Duration(seconds: 1));
+      if (!_isTimerRunning) return;
+
       setState(() {
-        _remainingSeconds = i;
+        _remainingSeconds--;
       });
-      if (i == 0) {
+
+      if (_remainingSeconds == 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Timer abgelaufen!')),
         );
