@@ -53,6 +53,13 @@ class TimerScreenState extends State<TimerScreen> {
     });
   }
 
+  void _clearTimer() {
+    setState(() {
+      _remainingSeconds = 0;
+      _isTimerRunning = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,6 +91,10 @@ class TimerScreenState extends State<TimerScreen> {
                 ElevatedButton(
                   onPressed: _isTimerRunning ? _stopTimer : null,
                   child: const Text('Stop'),
+                ),
+                ElevatedButton(
+                  onPressed: _clearTimer,
+                  child: const Text('Clear'),
                 ),
               ],
             ),

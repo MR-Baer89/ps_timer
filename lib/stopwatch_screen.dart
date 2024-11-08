@@ -8,20 +8,25 @@ class StopwatchScreen extends StatefulWidget {
 }
 
 class _StopwatchScreenState extends State<StopwatchScreen> {
-  int _elapsedSeconds = 0;
+  int _elapsedMilliseconds = 0;
   bool _isTimerRunning = false;
+  Stopwatch? _stopwatch;
 
   void _startTimer() {
     setState(() {
       _isTimerRunning = true;
     });
 
-    Future.delayed(const Duration(seconds: 1), () {
+    _stopwatch ??= Stopwatch()..start();
+
+    Future.delayed(const Duration(milliseconds: 10), () {
       if (_isTimerRunning) {
         setState(() {
-          _elapsedSeconds++;
+          _elapsedMilliseconds = _stopwatch!.elapsedMilliseconds;
         });
         _startTimer();
+      } else {
+        _stopwatch!.stop();
       }
     });
   }
@@ -30,13 +35,24 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
     setState(() {
       _isTimerRunning = false;
     });
+    _stopwatch?.stop();
   }
 
   void _resetTimer() {
     _stopTimer();
     setState(() {
-      _elapsedSeconds = 0;
+      _elapsedMilliseconds = 0;
+      _stopwatch?.reset();
     });
+  }
+
+  String _formatTime(int milliseconds) {
+    final int seconds = (milliseconds / 1000).floor();
+    final int remainingMilliseconds = milliseconds - (seconds * 1000);
+    final String secondsStr = seconds.toString().padLeft(2, '0');
+    final String millisecondsStr =
+        remainingMilliseconds.toString().padLeft(3, '0');
+    return '$secondsStr.$millisecondsStr s';
   }
 
   @override
@@ -47,7 +63,7 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '$_elapsedSeconds s',
+              _formatTime(_elapsedMilliseconds),
               style: const TextStyle(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
